@@ -4,6 +4,8 @@ dotenv.config()
 const Joi = require("joi")
 const jwt = require('jsonwebtoken')
 const User = require('../../models/User/userModel')
+const Transaction = require('../../models/Transaction/transactionLogs')
+const Balance = require('../../models/Transaction/userBalance')
 const bcrypt = require('bcryptjs')
 const { errorResMsg, successResMsg } = require('../../utils/libs/response')
 const validateUser = require('../../utils/validations/validateSchema')
@@ -55,7 +57,13 @@ const registerUser = async(req, res) => {
         userid: epKey,
         address
     })
-    return successResMsg(res, 201, { message: "User creation was successful", data: userData })
+
+    const userBalance = await Balance.create({
+        address,
+        userid: userData._id,
+        amount: 0
+    })
+    return successResMsg(res, 201, { message: "User creation was successful", userDetails: userData, walletDetails: userBalance })
 }
 
 const loginUser = async(req, res) => {
@@ -69,4 +77,20 @@ const loginUser = async(req, res) => {
         email: user.email
     })
     return successResMsg(res, 201, { message: "login was successful", data: signature })
+}
+
+const getUserAddressAndBalance = async (req, res) => {
+    const person = req.user
+    const findUser = await User.findById(person.id)
+    if(!findUser) return errorResMsg(res, 400, { message: "Invalid user details" })
+    const findUserWallet = await Balance.findOne({ userid: findUser._id })
+    if(!findUserWallet) return errorResMsg(res, 400, { message: "Invalid user details" })
+    return successResMsg(res, 200, { message: findUserWallet })
+}
+
+
+module.exports = {
+    registerUser,
+    loginUser,
+    getUserAddressAndBalance
 }

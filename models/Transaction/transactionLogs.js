@@ -4,9 +4,15 @@ const schema = mongoose.Schema
 const transactionLogsSchema = new schema({
     txnId: String,
     amount: String,
-    userId: Number,
+    userId: String,
+    receiver: String,
+    sender: String,
+    transactionType: String,
+    fee: Number,
     type: String,
     status: Number
+}, {
+    timestamps: true
 })
 
 const TransactionLogs = mongoose.model('transactionlog', transactionLogsSchema)
