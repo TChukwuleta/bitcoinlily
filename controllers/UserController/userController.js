@@ -7,6 +7,7 @@ const User = require('../../models/User/userModel')
 const Transaction = require('../../models/Transaction/transactionLogs')
 const Balance = require('../../models/Transaction/userBalance')
 const bcrypt = require('bcryptjs')
+const moment = require('moment')
 const { errorResMsg, successResMsg } = require('../../utils/libs/response')
 const validateUser = require('../../utils/validations/validateSchema')
 const { encryptData } = require('../../utils/libs/manageData')
@@ -54,9 +55,11 @@ const registerUser = async(req, res) => {
         lastname: req.body.lastName,
         email: req.body.email,
         password: hashPassword,
-        userid: epKey,
+        userid: epKey.encryptedData,
+        iv: epKey.base64IV,
         address
     })
+    console.log(userData)
 
     const userBalance = await Balance.create({
         address,
@@ -70,12 +73,15 @@ const loginUser = async(req, res) => {
     validateUser(loginSchema)
     const user = await User.findOne({ email: req.body.email })
     if(!user) return errorResMsg(res, 400, { message: "Invalid login details" })
+    console.log(user)
     const verifyPassword = bcrypt.compare(req.body.password, user.password)
     if(!verifyPassword) return errorResMsg(res, 400, { message: "Invalid login details" })
     const signature = await createToken({
         id: user._id,
-        email: user.email
+        email: user.email,
+        iat: moment().unix()
     })
+    console.log(signature)
     return successResMsg(res, 201, { message: "login was successful", data: signature })
 }
 
@@ -88,9 +94,24 @@ const getUserAddressAndBalance = async (req, res) => {
     return successResMsg(res, 200, { message: findUserWallet })
 }
 
+const getUser = async (req, res) => {
+    const person = req.params.id
+    const findUser = await User.findById(person)
+    if(!findUser) return errorResMsg(res, 400, { message: "Invalid user details" })
+    return successResMsg(res, 200, { message: findUser })
+}
+
+const getAllUsers = async (req, res) => {
+    const getUsers = await User.find()
+    if(!getUsers) return errorResMsg(res, 400, { message: "Invalid user details" })
+    return successResMsg(res, 200, { message: getUsers })
+}
+
 
 module.exports = {
     registerUser,
     loginUser,
-    getUserAddressAndBalance
+    getUserAddressAndBalance,
+    getUser,
+    getAllUsers
 }

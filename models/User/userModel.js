@@ -6,6 +6,7 @@ const userSchema = new schema({
     lastname: String,
     email: String,
     password: String,
+    iv: String,
     userid: String,
     address: String
 })

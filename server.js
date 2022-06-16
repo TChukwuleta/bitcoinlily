@@ -9,14 +9,12 @@ process.on('uncaughtException', (err) => {
 })
 const app = require('./app')
 
-const DB = '' // DB connection
+const DB = 'mongodb://localhost:27017/lillywallet' // DB connection
 
 mongoose
 .connect(DB, {
     useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
+    useUnifiedTopology: true
 })
 .then(() => {
     console.log("Console to DB successfully...")

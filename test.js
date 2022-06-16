@@ -2,7 +2,7 @@ const crypto = require('crypto')
 
 const encryptData = (stringMessage) => {
     const algorithm = 'aes-256-cbc'
-    const key = "adnan-tech-programming-computers"
+    const key = "adnan-tech-programming-computers" 
     const initializedVector = crypto.randomBytes(16)
     // Encrypt string using algo, private key and initialization vector
     const cipher = crypto.createCipheriv(algorithm, key, initializedVector)
@@ -13,7 +13,7 @@ const encryptData = (stringMessage) => {
     console.log("Encrypted data: ", encryptDataValue)
     console.log("Initialization Vector: ", base64IV)
 }
-
+ 
 const decryptData = (encryptedString, IV) => {
     const originalIV = Buffer.from(IV, 'base64')
     const algorithm = 'aes-256-cbc'

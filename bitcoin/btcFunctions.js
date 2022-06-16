@@ -1,5 +1,5 @@
 const { generateMnemonic, mnemonicToSeed } = require("bip39")
-const { fromSeed } = require('bip32')
+const { fromSeed, fromBase58 } = require('bip32')
 const { networks, payments, bip32, Psbt } = require("bitcoinjs-lib")
 const coinselect = require('coinselect')
 const axios = require("axios")
@@ -10,30 +10,32 @@ const BASE_URL = "https://sochain.com/api/v2"
 
 // Generate new mnemonic and private key
 const getPrivateKey = async () => {
-    const mnemonic = generateMnemonic(256)
-    const seed = mnemonicToSeed(mnemonic)
+    const mnemonic = await generateMnemonic(256)
+    const seed = await mnemonicToSeed(mnemonic)
     const privateKey = fromSeed(seed, networks.testnet)
-    return privateKey
+    return privateKey 
 }
 
 // Generate public key from private key
 const getXPubFromPrivateKey = async (key, path) => {
     const child = key.derivePath(path).neutered()
     const xpub = child.toBase58()
-    return xpub
+    return xpub 
 }
 
 // Generate wallet address
 const getAddress = async (key, path) => {
     const xPubKey = await getXPubFromPrivateKey(key, path)
-    const node = bip32.fromBase58(xPubKey, networks.testnet)
-    const child = node.derivePath(path)
+    const node = fromBase58(xPubKey, networks.testnet)
+    const account = key.derivePath(path)
+    //const account = node.derivePath(path)
+    const child = account.derive(0).derive(0)
     const address = payments.p2wpkh({
         pubkey: child.publicKey,
         network: networks.testnet
     })
-    return address
-}
+    return address.address
+} 
 
 // Create a bitcoin transaction
 const createTransaction = async (senderAddress, recipientAddress, amountInSats, changeAddress, feeRate) => {
