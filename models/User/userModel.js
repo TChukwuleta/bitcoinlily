@@ -8,7 +8,10 @@ const userSchema = new schema({
     password: String,
     iv: String,
     userid: String,
+    pubkey: String,
     address: String
+}, {
+    timestamps: true
 })
 
 const User = mongoose.model('user', userSchema)

@@ -31,6 +31,8 @@ const sendMoney = async () => {
     `)
 }
 
+sendMoney()
+
 const makeTransaction = async (fromAddress, toAddress, amount) => {
     const network = bitcoin.networks.testnet
     const chainNetwork = 'BTCTEST'
@@ -95,4 +97,50 @@ const makeTransaction = async (fromAddress, toAddress, amount) => {
 
 //n4WvGJJTpY95gUpagLbuP3MXF2BVypfhGc
 //ms4wBEx4extn6P4WbR8ihSFYxrHjRH2qDC
-console.log(makeTransaction('n4WvGJJTpY95gUpagLbuP3MXF2BVypfhGc', 'mtVE8anM63kQcgKUC6oQQD9K6xiV4wsr7q', 0.000001))
+//console.log(makeTransaction('n4WvGJJTpY95gUpagLbuP3MXF2BVypfhGc', 'mtVE8anM63kQcgKUC6oQQD9K6xiV4wsr7q', 0.000001)) 
+
+//using bitcoin.Psbt
+// const { inputs, outputs, fee } = coinselect(
+    //     UtxoInputs,
+    //     [
+    //         {
+    //             address: recipientAddress,
+    //             value: amountInSats 
+    //         }
+    //     ], 
+    //     feeRate  
+    // )
+
+    // const psbt = new Psbt({ network: networks.testnet })
+
+    // inputs.forEach(input => {
+    //     psbt.addInput({
+    //         hash: input.txid,
+    //         index: input.vout,
+    //         sequence: 0xfffffffd,
+    //         witnessUtxo: {
+    //             value: input.value,
+    //             script: input.address.output
+    //         },
+    //         bip32Derivation: input.bip32Derivation
+    //     })
+    // });
+
+    // outputs.forEach(output => {
+    //     if(!output.address){
+    //         output.address = changeAddress
+    //     }
+    //     psbt.addOutput({
+    //         address: output.address,
+    //         value: output.value
+    //     })
+    // })
+    // return psbt
+
+    // Sign Transactions using the private key
+// const signTransaction = async (psbt, key) => {
+//     psbt.signAllInputsHD(key)
+//     psbt.validateSignaturesOfAllInputs()
+//     psbt.finalizeAllInputs()
+//     return psbt
+// }

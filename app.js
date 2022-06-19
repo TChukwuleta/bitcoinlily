@@ -4,6 +4,7 @@ const morgan = require("morgan")
 const dotenv = require("dotenv")
 const helmet = require("helmet")
 const authRoutes = require('./routes/userRoutes/authRoutes')
+const walletRoutes = require('./routes/walletRoutes/walletRoutes')
 const mongoSanitize = require("express-mongo-sanitize")
 const globalErrorHandler = require('./controllers/errorController')
 
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 })
 
 app.use(authRoutes);
+app.use(walletRoutes)
 
 app.all("*", (req, res) => {
     res.status(404).json({ message: `Can't find resource ${req.originalUrl} on this server` })

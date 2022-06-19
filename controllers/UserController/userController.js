@@ -11,7 +11,7 @@ const moment = require('moment')
 const { errorResMsg, successResMsg } = require('../../utils/libs/response')
 const validateUser = require('../../utils/validations/validateSchema')
 const { encryptData } = require('../../utils/libs/manageData')
-const { getPrivateKey, getAddress } = require('../../bitcoin/btcFunctions')
+const { getKeys } = require('../../bitcoin/btcFunctions')
 
 // Derivation path 
 const derivationPath = "m/84'/0'/0'"; // P2WPKH
@@ -45,24 +45,27 @@ const registerUser = async(req, res) => {
     const salt = await bcrypt.genSalt(10)
     const hashPassword = await bcrypt.hash(req.body.password, salt)
 
-    const privateKey = await getPrivateKey()
-    const address = await getAddress(privateKey, derivationPath)
-    const keydata = `${privateKey}+${hashPassword}`
-    const epKey = await encryptData(keydata)
+    const keys = await getKeys(derivationPath)
+    console.log(`Private key: ${keys.privateKey}`)
+    console.log(`Password hash: ${hashPassword}`)
+    const keydata = `${keys.privateKey}+${hashPassword}`
+    console.log(`Key data is: ${keydata}`)
+    const epKey = await encryptData(keydata) 
 
     const userData = await User.create({
         firstname: req.body.firstName,
         lastname: req.body.lastName,
         email: req.body.email,
         password: hashPassword,
-        userid: epKey.encryptedData,
+        userid: epKey.encryptDataValue,
         iv: epKey.base64IV,
-        address
+        address: keys.address,
+        pubkey: keys.publicKey
     })
     console.log(userData)
 
     const userBalance = await Balance.create({
-        address,
+        address: keys.address,
         userid: userData._id,
         amount: 0
     })
