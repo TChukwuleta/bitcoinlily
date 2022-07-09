@@ -15,6 +15,7 @@ const { getKeys } = require('../../bitcoin/btcFunctions')
 
 // Derivation path 
 const derivationPath = "m/84'/0'/0'"; // P2WPKH
+const path = `m/44'/0'/0'/0` // P2PKH
 
 // Registration schema
 const registrationSchema = Joi.object({
@@ -45,11 +46,8 @@ const registerUser = async(req, res) => {
     const salt = await bcrypt.genSalt(10)
     const hashPassword = await bcrypt.hash(req.body.password, salt)
 
-    const keys = await getKeys(derivationPath)
-    console.log(`Private key: ${keys.privateKey}`)
-    console.log(`Password hash: ${hashPassword}`)
+    const keys = await getKeys(path)
     const keydata = `${keys.privateKey}+${hashPassword}`
-    console.log(`Key data is: ${keydata}`)
     const epKey = await encryptData(keydata) 
 
     const userData = await User.create({
@@ -62,8 +60,6 @@ const registerUser = async(req, res) => {
         address: keys.address,
         pubkey: keys.publicKey
     })
-    console.log(userData)
-
     const userBalance = await Balance.create({
         address: keys.address,
         userid: userData._id,

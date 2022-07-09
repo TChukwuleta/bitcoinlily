@@ -12,8 +12,6 @@ const encryptData = async (stringMessage) => {
     encryptDataValue += cipher.final("hex")
     // convert initializationvector to base 64 string
     const base64IV = Buffer.from(initializedVector, 'binary').toString('base64')
-    console.log("Encrypted data: ", encryptDataValue)
-    console.log("Initialization Vector: ", base64IV)
     return {
         encryptDataValue,
         base64IV

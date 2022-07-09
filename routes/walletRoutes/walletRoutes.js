@@ -5,6 +5,6 @@ const walletController = require('../../controllers/WalletController/walletContr
 // Register user
 router.post('/transact/:id', walletController.createTransactionFunction)
 // get user
-router.get('/userwallet')
+router.get('/walletbalance/:id', walletController.getUserWalletBalance)
 
 module.exports = router
