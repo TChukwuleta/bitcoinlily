@@ -111,12 +111,41 @@ const broadcastTxn = async(txHex) => {
     const output = `Successful: ${data.data}`
     return output
 }
+
+const CreateMultisigAddress = async (data) => {
+    const network = bitcoin.networks.testnet
+    const p2ms = bitcoin.payments.p2ms({
+        m: data.m,
+        pubkey: data.publicKeys,
+        network
+    })
+    let multisigAddress;
+    switch (data.scriptType) {
+        case "P2SH":
+          const p2sh = bitcoin.payments.p2sh({ redeem: p2ms, network })
+          multisigAddress = p2sh.address
+          const p2shOutput = p2sh.redeem.output
+          return { p2shOutput, multisigAddress };
+        case "P2WSH":
+          const p2wsh = bitcoin.payments.p2wsh({ redeem: p2ms, network })
+          multisigAddress = p2wsh.address
+          const p2wshOutput = p2wsh.redeem.output
+          return { p2wshOutput, multisigAddress };
+        case "P2SHP2WSH":
+          const p2wshh = bitcoin.payments.p2wsh({ redeem: p2ms, network })
+          const p2shh = bitcoin.payments.p2sh({ redeem: p2wshh, network })
+          multisigAddress = p2shh.address
+          const p2shhOutput = p2shh.redeem.output
+          const p2wshhOutput = p2wshh.redeem.output
+          return { p2shhOutput, p2wshhOutput, multisigAddress }
+    }
+}
  
 
 module.exports = {
     createTransaction,
     getAddressUTXODetails,
     broadcastTxn,
-    getKeys
-
+    getKeys,
+    CreateMultisigAddress
 }
